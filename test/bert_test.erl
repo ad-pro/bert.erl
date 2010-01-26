@@ -15,7 +15,7 @@ round_trip_dict_test() ->
   Bin = encode(D),
   ?assertEqual(D, decode(Bin)).
 
-=======
+%% decode
  
 decode_list_nesting_test() ->
   Bert = term_to_binary([foo, {bert, true}]),
