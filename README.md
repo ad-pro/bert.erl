@@ -46,3 +46,6 @@ Examples
     % Decode a BERT binary:
     bert:decode(<<131,108,0,0,0,7,97,42,99,51,46,49,52,...>>).
     % -> [42, 3.14, banana, {xy, 5, 10}, <<"robot">>, true, false]
+
+TODO:
+    Add dict fix from any other branch.
