@@ -29,6 +29,8 @@ To decode BERT binaries to Erlang terms, use:
 
     decode(binary()) -> term().
 
+You can also use encode64/decode64 to encode/decode base64-coded BERT (which can be used over websockets, for example).
+
 Examples
 
     % Encode a variety of literal Erlang terms:
