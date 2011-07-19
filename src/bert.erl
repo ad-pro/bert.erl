@@ -6,6 +6,7 @@
 -author("Tom Preston-Werner").
 
 -export([encode/1, decode/1]).
+-export([encode64/1, decode64/1]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -15,14 +16,20 @@
 %% Public API
 
 -spec encode(term()) -> binary().
-
 encode(Term) ->
   term_to_binary(encode_term(Term)).
 
 -spec decode(binary()) -> term().
-
 decode(Bin) ->
   decode_term(binary_to_term(Bin)).
+
+-spec encode64(binary()) -> binary().
+encode64(Term) ->
+    base64:encode(encode(Term)).
+
+-spec decode64(binary()) -> binary().
+decode64(Term) ->
+    decode(base64:decode(Term)).
 
 %%---------------------------------------------------------------------------
 %% Encode
@@ -91,4 +98,8 @@ decode_tuple_nesting_test() ->
   Bert = term_to_binary({foo, {bert, true}}),
   Term = {foo, true},
   Term = decode(Bert).
+
+base64_test() ->
+    A = [foo, {bar, baz}],
+    ?assertEqual(A, decode64(encode64(A))).
 -endif.
