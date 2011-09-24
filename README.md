@@ -1,25 +1,33 @@
-Erlang BERT encoder/decoder. See http://bert-rpc.org for full spec.
+Erlang BERT encoder/decoder
+===========================
 
+See http://bert-rpc.org for full spec.
 Watch and contribute to this module at http://github.com/mojombo/bert.erl.
 
-This module is Semantic Versioning (http://semver.org) compliant.
+This module is [Semantic Versioning](http://semver.org) compliant.
+
+Supported types
+---------------
 
 The following types can be automatically encoded and decoded.
-See http://www.erlang.org/eeps/eep-0008.html for type definitions.
+See [EEP-0008](http://www.erlang.org/eeps/eep-0008.html) for type definitions.
 
-  integer() -> BERT integer
-  float()   -> BERT float
-  atom()    -> BERT atom
-  tuple()   -> BERT tuple
-  list()    -> BERT list or BERT bytelist
-  string()  -> BERT list or BERT bytelist (you probably want binary)
-  binary()  -> BERT binary
-  []        -> BERT nil (complex)
-  bool()    -> BERT boolean (complex)
-  dict()    -> BERT dict (complex)
+ - `integer()` -> BERT integer
+ - `float()`   -> BERT float
+ - `atom()`    -> BERT atom
+ - `tuple()`   -> BERT tuple
+ - `list()`    -> BERT list or BERT bytelist
+ - `string()`  -> BERT list or BERT bytelist (you probably want binary)
+ - `binary()`  -> BERT binary
+ - `[]`        -> BERT nil (complex)
+ - `bool()`    -> BERT boolean (complex)
+ - `dict()`    -> BERT dict (complex)
 
 Because times and regular expressions types cannot be automatically
 detected, you must encode and decode those types manually.
+
+Usage
+-----
 
 To encode Erlang terms to BERT binaries, use:
 
@@ -29,9 +37,11 @@ To decode BERT binaries to Erlang terms, use:
 
     decode(binary()) -> term().
 
-You can also use encode64/decode64 to encode/decode base64-coded BERT (which can be used over websockets, for example).
+You can also use encode64/decode64 to encode/decode base64-coded BERT
+(which can be used over websockets, for example).
 
 Examples
+--------
 
     % Encode a variety of literal Erlang terms:
     bert:encode([42, 3.14, banana, {xy, 5, 10}, <<"robot">>, true, false]).
@@ -46,6 +56,3 @@ Examples
     % Decode a BERT binary:
     bert:decode(<<131,108,0,0,0,7,97,42,99,51,46,49,52,...>>).
     % -> [42, 3.14, banana, {xy, 5, 10}, <<"robot">>, true, false]
-
-TODO:
-    Add dict fix from any other fork.
