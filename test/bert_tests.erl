@@ -1,6 +1,6 @@
 -module(bert_tests).
 -include_lib("eunit/include/eunit.hrl").
--import(bert, [encode/1, decode/1]).
+-import(bert, [encode/1, decode/1, encode64/1, decode64/1]).
 
 % simple terms (both encoding and decoding)
 
@@ -58,3 +58,9 @@ decode_nested_test() ->
     ?assertEqual(dict:from_list([{true, dict:from_list([{42, []}])}]),
         decode(term_to_binary(
             {bert, dict, [{{bert, true}, {bert, dict, [{42, {bert, nil}}]}}]}))).
+
+%% base64
+
+base64_test() ->
+    A = [foo, {bar, baz}],
+    ?assertEqual(A, decode64(encode64(A))).

@@ -6,6 +6,7 @@
 -author("Tom Preston-Werner").
 
 -export([encode/1, decode/1]).
+-export([encode64/1, decode64/1]).
 
 %%---------------------------------------------------------------------------
 %% Public API
@@ -17,6 +18,14 @@ encode(Term) ->
 -spec decode(binary()) -> term().
 decode(Bin) ->
     decode_term(binary_to_term(Bin)).
+
+-spec encode64(binary()) -> binary().
+encode64(Term) ->
+    base64:encode(encode(Term)).
+
+-spec decode64(binary()) -> binary().
+decode64(Term) ->
+    decode(base64:decode(Term)).
 
 %%---------------------------------------------------------------------------
 %% Encode

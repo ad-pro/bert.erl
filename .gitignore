@@ -1,6 +1,6 @@
+/ebin
 /doc
 /_test
 /.eunit
 /docs
-ebin
 *.dump
