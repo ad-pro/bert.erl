@@ -2,52 +2,59 @@
 -include_lib("eunit/include/eunit.hrl").
 -import(bert, [encode/1, decode/1]).
 
-%% encode
+% simple terms (both encoding and decoding)
 
-encode_list_nesting_test() ->
-  Bert = term_to_binary([foo, {bert, true}]),
-  Bert = encode([foo, true]).
+-define(assertEncode(Data, CorrectTerm),
+    ?assertEqual(binary_to_term(encode(Data)), CorrectTerm),
+    ?assertEqual(decode(term_to_binary(CorrectTerm)), Data)).
 
-encode_tuple_nesting_test() ->
-  Bert = term_to_binary({foo, {bert, true}}),
-  Bert = encode({foo, true}).
+basic_types_test() ->
+    lists:map(
+        fun(X) -> ?assertEncode(X, X) end,
+        [4,
+         8.1516,
+         foo,
+         {coord, 23, 42},
+         [1, 2, 3],
+         [a, [1, 2]],
+         <<"Roses are red\0Violets are blue">>]
+    ).
 
-encode_dict_test() ->
-  Bert = term_to_binary({ bert, dict,
-                          dict:to_list(dict:store(foo, true, dict:new())) }),
-  Bert = encode(dict:store(foo, true, dict:new())).
+nil_test() ->
+    ?assertEncode([], {bert, nil}).
 
-%% decode
+special_atoms_test() ->
+    ?assertEncode(true, {bert, true}),
+    ?assertEncode(false, {bert, false}).
 
-decode_list_nesting_test() ->
-  Bert = term_to_binary([foo, {bert, true}]),
-  Term = [foo, true],
-  Term = decode(Bert).
+empty_dictionary_test() ->
+    ?assertEncode(dict:new(), {bert, dict, []}).
 
-decode_tuple_nesting_test() ->
-  Bert = term_to_binary({foo, {bert, true}}),
-  Term = {foo, true},
-  Term = decode(Bert).
+% encoding
 
-decode_dict_test() ->
-  Bert = term_to_binary({ bert, dict,
-                          dict:to_list(dict:store(foo, true, dict:new())) }),
-  Term = dict:store(foo, true, dict:new()),
-  Term = decode(Bert).
+encode_dictionary_test() ->
+    ?assertMatch({bert, dict, [_, _]},
+                 binary_to_term(encode(dict:from_list([{name, <<"Tom">>}, {age, 30}])))).
 
-decode_dict_nesting_test() ->
-  Bert = term_to_binary({ bert, dict,
-                          dict:to_list(dict:store(a,
-                                                  { bert, dict,
-                                                    dict:to_list(dict:store(b, "b", dict:new()))
-                                                  },
-                                                  dict:new())) }),
-  Term = dict:store(a, dict:store(b, "b", dict:new()), dict:new()),
-  Term = decode(Bert).
+encode_nested_test() ->
+    ?assertEncode([foo, [true, false], {42, dict:new()}],
+                  [foo, [{bert, true}, {bert, false}], {42, {bert, dict, []}}]),
+    Data = binary_to_term(encode(dict:from_list([{42, true}, {empty, dict:new()}]))),
+    ?assertMatch({bert, dict, [_, _]}, Data),
+    {bert, dict, DictItems} = Data,
+    ?assertEqual([], ordsets:subtract(ordsets:from_list(DictItems),
+                                      [{42, {bert, true}}, {empty, {bert, dict, []}}])).
 
-%% both
+%% decoding
 
-round_trip_dict_test() ->
-  D = dict:store("my", balls, dict:store("number", 1234, dict:store("suckit", [], dict:new()))),
-  Bin = encode(D),
-  ?assertEqual(D, decode(Bin)).
+decode_dictionary_test() ->
+    Items = [{name, <<"Tom">>}, {age, 30}],
+    ?assertEqual(
+        [],
+        ordsets:subtract(ordsets:from_list(Items),
+        dict:to_list(decode(term_to_binary({bert, dict, Items}))))).
+
+decode_nested_test() ->
+    ?assertEqual(dict:from_list([{true, dict:from_list([{42, []}])}]),
+        decode(term_to_binary(
+            {bert, dict, [{{bert, true}, {bert, dict, [{42, {bert, nil}}]}}]}))).
