@@ -4,3 +4,4 @@
 /.eunit
 /docs
 *.dump
+/rebar
