@@ -31,7 +31,8 @@ encode_term(Term) ->
     true -> {bert, true};
     false -> {bert, false};
     Dict when is_tuple(Term) andalso element(1, Term) =:= dict ->
-      {bert, dict, encode_term(dict:to_list(Dict))};
+      {bert, dict, lists:map(fun({K, V}) ->
+        {encode_term(K), encode_term(V)} end, dict:to_list(Dict))};
     List when is_list(Term) ->
       lists:map((fun encode_term/1), List);
     Tuple when is_tuple(Term) ->
