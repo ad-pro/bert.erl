@@ -44,3 +44,10 @@ decode_dict_nesting_test() ->
                                                   dict:new())) }),
   Term = dict:store(a, dict:store(b, "b", dict:new()), dict:new()),
   Term = decode(Bert).
+
+%% both
+
+round_trip_dict_test() ->
+  D = dict:store("my", balls, dict:store("number", 1234, dict:store("suckit", [], dict:new()))),
+  Bin = encode(D),
+  ?assertEqual(D, decode(Bin)).
